@@ -23,7 +23,7 @@ const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
 
 let dbError = null;
 
-mongoose
+const dbReady = mongoose
   .connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 })
   .then(() => {
     console.log("✅ Connected to MongoDB");
@@ -44,12 +44,15 @@ const holidayRouter = require('./routes/holidayRouter');
 
 const DB_STATES = ["disconnected", "connected", "connecting", "disconnecting"];
 
-app.get('/', (req, res) => res.json({
-  status: "ok",
-  database: DB_STATES[mongoose.connection.readyState] || "unknown",
-  ...(dbError && { databaseError: dbError }),
-  corsOrigin: allowedOrigins,
-}));
+app.get('/', async (req, res) => {
+  await dbReady; // let the connection attempt finish so the status is meaningful
+  res.json({
+    status: "ok",
+    database: DB_STATES[mongoose.connection.readyState] || "unknown",
+    ...(dbError && { databaseError: dbError }),
+    corsOrigin: allowedOrigins,
+  });
+});
 
 app.use('/auth', authRouter);
 app.use('/task', taskRouter);
