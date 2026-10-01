@@ -21,12 +21,15 @@ const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+let dbError = null;
+
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 })
   .then(() => {
     console.log("✅ Connected to MongoDB");
   })
   .catch((err) => {
+    dbError = err.message;
     console.log("❌ Connection Error:");
     console.log(err);
   });
@@ -39,7 +42,14 @@ const taskRouter = require('./routes/taskRouter');
 const leaveRouter = require('./routes/leaveRouter');
 const holidayRouter = require('./routes/holidayRouter');
 
-app.get('/', (req, res) => res.json({ status: "ok" }));
+const DB_STATES = ["disconnected", "connected", "connecting", "disconnecting"];
+
+app.get('/', (req, res) => res.json({
+  status: "ok",
+  database: DB_STATES[mongoose.connection.readyState] || "unknown",
+  ...(dbError && { databaseError: dbError }),
+  corsOrigin: allowedOrigins,
+}));
 
 app.use('/auth', authRouter);
 app.use('/task', taskRouter);
