@@ -1,0 +1,125 @@
+.modal-backdrop-layer {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh;
+  background: rgba(0,0,0,0.3); 
+  backdrop-filter: blur(4px); 
+  -webkit-backdrop-filter: blur(4px);
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-sheet-card {
+  background: #FFFFFF; 
+  border-radius: 18px; 
+  width: 480px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.18); 
+  border: 1px solid var(--border);
+  padding: 24px; 
+  animation: popup 220ms ease-out;
+}
+
+.m-header { 
+  display: flex; 
+  border-radius: var(--radius-card);
+  align-items: center; 
+  justify-content: space-between; 
+  margin-bottom: 20px; 
+}
+
+.m-header h2 { 
+  font-size: 18px; 
+  font-weight: 700; 
+}
+
+.m-form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 16px; 
+}
+
+.m-label { 
+  font-size: 12px; 
+  font-weight: 600; 
+  color: var(--text-secondary); 
+}
+
+.m-input {
+  border: 1px solid rgba(0,0,0,0.12); 
+  border-radius: var(--radius-button);
+  padding: 10px 14px; 
+  font-size: 14px; 
+  width: 100%;
+}
+
+.m-input:focus { 
+  outline: none; 
+  border-color: var(--accent-blue); 
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.15); 
+}
+
+.seg-bar { 
+  display: flex; 
+  background: rgba(0,0,0,0.05); 
+  padding: 2px; 
+  border-radius: 9px; 
+  gap: 2px; 
+}
+
+.seg-btn {
+  flex: 1; 
+  border: none; 
+  background: transparent; 
+  padding: 6px 0;
+  font-size: 13px; 
+  font-weight: 500; 
+  color: var(--text-secondary); 
+  cursor: pointer; 
+  border-radius: 7px;
+}
+
+.seg-btn.active { 
+  background: #FFFFFF; 
+  color: var(--text-primary); 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+}
+
+.m-footer { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 12px; 
+  margin-top: 8px; 
+}
+
+.btn-close-x { 
+  background: transparent; 
+  border: none; 
+  color: var(--text-tertiary); 
+  cursor: pointer; 
+  padding: 4px;
+}
+
+@keyframes popup { 
+  from { opacity: 0; transform: scale(0.94); } 
+  to { opacity: 1; transform: scale(1); } 
+}
+
+/* Mobile Media Queries (Zero change on PC) */
+@media (max-width: 480px) {
+  .modal-sheet-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .seg-btn {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,59 @@
+.board-container { 
+  display: flex; 
+  flex-direction: column; 
+  height: 100%; 
+}
+
+.board-heading-block { 
+  margin-bottom: 24px; 
+}
+
+.board-title-h1 { 
+  font-size: 24px; 
+  font-weight: 700; 
+  letter-spacing: -0.5px; 
+}
+
+.board-subtitle-summary { 
+  font-size: 13px; 
+  color: var(--text-secondary); 
+  margin-top: 4px; 
+}
+
+.columns-layout-flex { 
+  display: flex; 
+  gap: 16px; 
+  height: calc(100vh - 200px); 
+  align-items: flex-start; 
+}
+
+/* Mobile Media Queries - Vertical Column Stack (Zero change on PC) */
+@media (max-width: 768px) {
+  .board-container {
+    height: auto;
+  }
+
+  .board-heading-block {
+    margin-bottom: 16px;
+  }
+
+  .board-title-h1 {
+    font-size: 20px;
+  }
+
+  .board-subtitle-summary {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .columns-layout-flex {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: unset;
+    gap: 20px;
+    overflow-x: visible;
+    padding-bottom: 32px;
+    align-items: stretch;
+  }
+}

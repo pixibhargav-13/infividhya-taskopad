@@ -1,0 +1,794 @@
+/* ==========================================================================
+   LEAVE MANAGEMENT SYSTEM STYLES
+   Matches the Apple-inspired TaskFlow CRM Design System
+   ========================================================================== */
+
+.leaves-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeIn 200ms ease-out;
+}
+
+/* Header Area */
+.leaves-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.leaves-header-title h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.leaves-header-title p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.btn-apply-leave-primary {
+  background: var(--accent-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-button);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25);
+  transition: all 150ms ease;
+}
+
+.btn-apply-leave-primary:hover {
+  background: #0077ED;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
+}
+
+/* Stats Cards Grid */
+.leaves-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.leave-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+  transition: transform 150ms ease;
+}
+
+.leave-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-card-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card-icon-box.blue {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--accent-blue);
+}
+
+.stat-card-icon-box.green {
+  background: rgba(52, 199, 89, 0.1);
+  color: var(--accent-green);
+}
+
+.stat-card-icon-box.amber {
+  background: rgba(255, 159, 10, 0.1);
+  color: var(--accent-amber);
+}
+
+.stat-card-icon-box.purple {
+  background: rgba(175, 82, 222, 0.1);
+  color: #AF52DE;
+}
+
+.stat-card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.stat-card-main-num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.stat-card-sub-num {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.stat-progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stat-progress-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 300ms ease;
+}
+
+/* Controls Bar (Search + Filters + Tabs) */
+.leaves-controls-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
+}
+
+.controls-left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.leaves-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+
+.leaves-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  width: 15px;
+  height: 15px;
+}
+
+.leaves-search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  padding: 8px 12px 8px 34px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 180ms ease;
+}
+
+.leaves-search-input:focus {
+  background: #FFFFFF;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+.leaves-type-select {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 150ms ease;
+}
+
+.leaves-type-select:focus {
+  border-color: var(--accent-blue);
+  background: #FFFFFF;
+}
+
+/* Status Segmented Filter Bar */
+.status-seg-bar {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px;
+  border-radius: 10px;
+  gap: 2px;
+}
+
+.status-seg-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-seg-btn.active {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.status-seg-count {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+}
+
+.status-seg-btn.active .status-seg-count {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--accent-blue);
+}
+
+/* Applications Table Container */
+.leaves-table-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.leaves-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.leaves-table th {
+  padding: 14px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.leaves-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  vertical-align: middle;
+}
+
+.leaves-table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaves-table tr:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+/* Leave Type Badge */
+.leave-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-badge);
+  text-transform: capitalize;
+}
+
+.leave-type-pill.sick {
+  background: rgba(255, 59, 48, 0.1);
+  color: #FF3B30;
+}
+
+.leave-type-pill.casual {
+  background: rgba(0, 113, 227, 0.1);
+  color: #0071E3;
+}
+
+.leave-type-pill.vacation {
+  background: rgba(52, 199, 89, 0.1);
+  color: #28A745;
+}
+
+.leave-type-pill.emergency {
+  background: rgba(255, 159, 10, 0.12);
+  color: #E68A00;
+}
+
+.leave-type-pill.other {
+  background: rgba(175, 82, 222, 0.1);
+  color: #AF52DE;
+}
+
+/* Date Details Column */
+.date-cell-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.date-range-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-duration-tag {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Reason Column */
+.reason-cell-text {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Status Pill */
+.leave-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.leave-status-badge.Pending {
+  background: rgba(255, 159, 10, 0.12);
+  color: #B26B00;
+}
+
+.leave-status-badge.Approved {
+  background: rgba(52, 199, 89, 0.12);
+  color: #1E7E34;
+}
+
+.leave-status-badge.Rejected {
+  background: rgba(255, 59, 48, 0.12);
+  color: #D32F2F;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-dot.Pending { background: #FF9F0A; }
+.status-dot.Approved { background: #34C759; }
+.status-dot.Rejected { background: #FF3B30; }
+
+/* Admin Status Select Dropdown */
+.leave-status-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.leave-status-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 26px 5px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: all 180ms ease;
+  font-family: inherit;
+}
+
+.leave-status-select.Pending {
+  background: rgba(255, 159, 10, 0.12);
+  color: #B26B00;
+  border: 1px solid rgba(255, 159, 10, 0.3);
+}
+
+.leave-status-select.Approved {
+  background: rgba(52, 199, 89, 0.12);
+  color: #1E7E34;
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.leave-status-select.Rejected {
+  background: rgba(255, 59, 48, 0.12);
+  color: #D32F2F;
+  border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+.leave-status-select:hover {
+  filter: brightness(0.96);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.leave-status-select:focus {
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+.leave-status-select-icon {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+  color: currentColor;
+  opacity: 0.7;
+}
+
+.leave-status-select option {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 6px;
+}
+
+/* Table Action Buttons */
+.btn-action-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+}
+
+.btn-action-delete:hover {
+  color: var(--accent-red);
+  background: rgba(255, 59, 48, 0.08);
+}
+
+/* Empty State */
+.empty-leaves-box {
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-leaves-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-leaves-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.empty-leaves-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 320px;
+}
+
+/* ==========================================================================
+   APPLY LEAVE MODAL STYLING
+   ========================================================================== */
+.leave-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.leave-modal-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  padding: 28px;
+  animation: modalScale 200ms ease-out;
+}
+
+.leave-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.leave-modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.leave-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.leave-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leave-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Leave Type Button Grid */
+.leave-types-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.leave-type-choice-btn {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #F9F9FB;
+  border-radius: var(--radius-button);
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 150ms ease;
+  text-transform: capitalize;
+}
+
+.leave-type-choice-btn:hover {
+  background: #FFFFFF;
+  border-color: rgba(0, 113, 227, 0.3);
+}
+
+.leave-type-choice-btn.active {
+  background: rgba(0, 113, 227, 0.08);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
+}
+
+/* Date Pickers Grid */
+.leave-dates-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.leave-input-field {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
+  border-radius: var(--radius-button);
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  width: 100%;
+  outline: none;
+  transition: all 150ms ease;
+}
+
+.leave-input-field:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.14);
+}
+
+.duration-summary-pill {
+  background: rgba(0, 113, 227, 0.06);
+  border: 1px solid rgba(0, 113, 227, 0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leave-textarea {
+  min-height: 80px;
+  resize: none;
+}
+
+.leave-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-modal-cancel {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.btn-modal-cancel:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-modal-submit {
+  background: var(--accent-blue);
+  color: #FFFFFF;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25);
+  transition: all 150ms ease;
+}
+
+.btn-modal-submit:hover {
+  background: #0077ED;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);
+}
+
+.leave-error-alert {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.25);
+  color: var(--accent-red);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes modalScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .leaves-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .btn-apply-leave-primary {
+    justify-content: center;
+  }
+
+  .leaves-controls-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .controls-left-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .leaves-search-box {
+    max-width: 100%;
+  }
+
+  .status-seg-bar {
+    overflow-x: auto;
+  }
+
+  .leaves-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaves-table {
+    min-width: 640px;
+  }
+
+  .leave-modal-card {
+    padding: 20px;
+    border-radius: 16px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .leave-dates-row {
+    grid-template-columns: 1fr;
+  }
+
+  .leave-types-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
