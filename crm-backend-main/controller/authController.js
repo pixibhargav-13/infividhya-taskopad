@@ -39,47 +39,59 @@ exports.verifytoken = async (req, res, next) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({
-      message: "Email and password are required",
-    });
-  }
-  const users = await User.findOne({ email });
-  if (!users) {
-    return res.status(404).json({
-      message: "user not found",
-    });
-  }
-  const checkpass = await bcrypt.compare(password, users.password);
-  if (!checkpass) {
-    return res.status(401).json({
-      message: "Incorrect password",
-    });
-  }
-
-  const accesstoken = jwt.sign(
-    {
-      id: users.id,
-      name: users.firstName + " " + users.lastName,
-    },
-    SECRET_TOKEN,
-    {
-      expiresIn: 60 * 60 * 10, // 10 hours
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
     }
-  );
+    const users = await User.findOne({ email });
+    if (!users) {
+      return res.status(404).json({
+        message: "user not found",
+      });
+    }
+    if (!users.password) {
+      return res.status(400).json({
+        message: "User password not set or corrupted",
+      });
+    }
+    const checkpass = await bcrypt.compare(password, users.password);
+    if (!checkpass) {
+      return res.status(401).json({
+        message: "Incorrect password",
+      });
+    }
 
-  return res.status(200).json({
-    accesstoken,
-    user: {
-      id: users._id,
-      firstName: users.firstName,
-      lastName: users.lastName,
-      email: users.email,
-      role: users.role,
-    },
-    message: "User logged in successfully",
-  });
+    const accesstoken = jwt.sign(
+      {
+        id: users._id,
+        name: `${users.firstName} ${users.lastName}`,
+      },
+      SECRET_TOKEN,
+      {
+        expiresIn: 60 * 60 * 10, // 10 hours
+      }
+    );
+
+    return res.status(200).json({
+      accesstoken,
+      user: {
+        id: users._id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        role: users.role,
+      },
+      message: "User logged in successfully",
+    });
+  } catch (err) {
+    console.error("Error during login in authController:", err);
+    return res.status(500).json({
+      message: err.message || "Internal server error during login",
+    });
+  }
 };
 
 exports.register = async (req, res) => {
