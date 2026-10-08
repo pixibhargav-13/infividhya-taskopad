@@ -103,8 +103,7 @@ exports.updateholiday = async (req,res) =>
             })
         }
 
-        const {Name, Date, Day, Type} = req.body;
-        const data = await Holiday.findByIdAndUpdate(id, {Name, Date, Day, Type, updated_by: req.user._id}, { returnDocument: 'after', runValidators: true });
+        const data = await Holiday.findByIdAndUpdate(id, req.body, { new: true });
          return res.status(200).json({
          message: "Holiday updated successfully",
          data,

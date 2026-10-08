@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel"); 
 const jwt = require("jsonwebtoken");
-const SECRET_TOKEN = process.env.JWT_SECRET;
+const SECRET_TOKEN = process.env.JWT_SECRET || "hello-world-crm";
 
 
 exports.verifytoken = async (req, res, next) => {
@@ -17,6 +17,8 @@ exports.verifytoken = async (req, res, next) => {
     const jwtToken = token.startsWith("Bearer ")
       ? token.split(" ")[1]
       : token;
+
+    console.log("Received Token:", jwtToken);
 
     const decoded = jwt.verify(jwtToken, SECRET_TOKEN);
 
@@ -73,7 +75,7 @@ const accesstoken = jwt.sign(
 },
 SECRET_TOKEN,
 {
-    expiresIn: 60*60,
+    expiresIn: 60*60 * 10, //10 days
 }
 )
 
@@ -94,16 +96,9 @@ SECRET_TOKEN,
 exports.register = async(req,res) => {
     try
     {
-        // Only accept profile fields; role is never self-assigned (see scripts/make-admin.js)
-        const { firstName, lastName, email, password } = req.body
-        if (!password || password.length < 6) {
-            return res.status(400).json({ message: "Password must be at least 6 characters" })
-        }
-        if (await User.findOne({ email })) {
-            return res.status(409).json({ message: "Email is already registered" })
-        }
-        const hashedpass = await bcrypt.hash(password, 12)
-        await User.create({ firstName, lastName, email, password: hashedpass })
+        const userdata = req.body
+        const hashedpass = await bcrypt.hash(userdata.password, 12)
+        await User.create({...userdata, password: hashedpass})
         return res.status(201).json({
             message: "User Created Succesfully"
         })

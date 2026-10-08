@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo , useEffect } from "react";
 import { 
   CalendarDays, 
@@ -14,31 +15,16 @@ import {
   Trash2
 } from "lucide-react";
 import AddHolidayModal from "../components/AddHolidayModal";
+import SkeletonLoader from "../components/SkeletonLoader";
+import FetchErrorState from "../components/FetchErrorState";
 import "../styles/Holidays.css";
 import API from "../api/api"; // Import the API instance for making requests
-
-/**
- * =========================================================================
- * HOLIDAYS VIEW (FRONTEND ONLY)
- * 
- * Ready for your backend implementation!
- * You can implement and connect the endpoints whenever you are ready:
- * 
- * 1. Fetch holidays on mount:
- *    GET http://localhost:8000/holiday
- * 
- * 2. Add a new holiday:
- *    POST http://localhost:8000/holiday
- *    Body: { Name, Date, Day, Type }
- * 
- * 3. Delete a holiday:
- *    DELETE http://localhost:8000/holiday/:id
- * =========================================================================
- */
 
 export default function Holidays() {
   // Pure frontend state - starts empty
   const [holidays, setHolidays] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
@@ -47,17 +33,31 @@ export default function Holidays() {
   const [holidayToEdit, setHolidayToEdit] = useState(null);
 
 
-const user = JSON.parse(localStorage.getItem("user"));
+  const rawUser = localStorage.getItem("user");
+  let user = null;
+  try {
+    const parsed = rawUser ? JSON.parse(rawUser) : null;
+    user = parsed?.user || parsed;
+  } catch {
+    user = null;
+  }
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   //getholidays
   const fetchHolidays = async () => {
+  setIsLoading(true);
+  setError(null);
   try {
-    const response = await API.get("/holiday");
+    const response = await API.get("/holiday", { timeout: 15000 });
 
     console.log("Holidays are:", response.data.data);
 
-    setHolidays(response.data.data);
+    setHolidays(response.data.data || []);
+    setError(null);
   } catch (error) {
     console.error("Error fetching holidays:", error);
+    setError("Can't fetch Holidays");
+  } finally {
+    setIsLoading(false);
   }
 };
 
@@ -257,7 +257,7 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-         { user?.role === "admin" && (
+         { isAdmin && (
             <button 
               type="button"
               className="btn-add-holiday-primary"
@@ -383,8 +383,17 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
         </div>
       </div>
 
-      {/* Main Content: Card Grid View or Table View */}
-      {viewMode === "grid" ? (
+      {/* Main Content: Error / Skeleton / Card Grid / Table View */}
+      {error ? (
+        <FetchErrorState 
+          title={error}
+          message="Could not fetch holiday records from server. The request timed out (15s limit) or the server is starting up."
+          onRetry={fetchHolidays}
+          isRetrying={isLoading}
+        />
+      ) : isLoading && holidays.length === 0 ? (
+        <SkeletonLoader count={6} />
+      ) : viewMode === "grid" ? (
         <div className="holidays-cards-grid">
           {filteredHolidays.length === 0 ? (
             <div className="empty-holidays-box">
@@ -395,17 +404,17 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
               <div className="empty-holidays-sub">
                 Click "Add Holiday" above to schedule a new holiday for your team.
               </div>
-                          {user?.role === "admin" && (
-                    <button
-                      type="button"
-                      className="btn-add-holiday-primary"
-                      style={{ marginTop: "12px" }}
-                      onClick={() => setShowAddModal(true)}
-                    >
-                      <Plus size={15} />
-                      <span>Add First Holiday</span>
-                    </button>
-                  )}
+            {isAdmin && (
+              <button
+                type="button"
+                className="btn-add-holiday-primary"
+                style={{ marginTop: "12px" }}
+                onClick={() => setShowAddModal(true)}
+              >
+                <Plus size={15} />
+                <span>Add First Holiday</span>
+              </button>
+            )}
             </div>
           ) : (
             filteredHolidays.map((item) => {
@@ -413,16 +422,17 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
               const status = getHolidayStatus(item.Date);
 
               return (
-                                        <div
-                          key={item._id}
-                          className="holiday-card"
-                          onClick={() => {
-                            if (user?.role === "admin") {
-                              setHolidayToEdit(item);
-                              setShowAddModal(true);
-                            } 
-                          }}
-                        >
+                <div
+                  key={item._id}
+                  className="holiday-card"
+                  style={{ cursor: isAdmin ? "pointer" : "default" }}
+                  onClick={() => {
+                    if (isAdmin) {
+                      setHolidayToEdit(item);
+                      setShowAddModal(true);
+                    } 
+                  }}
+                >
                   
                   <div className="holiday-card-top">
                     {/* Date Block */}
@@ -441,18 +451,20 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
                           <span>{formatDate(item.Date)}</span>
                         </div>
 
-                        {/* Delete button */}
-                        <button
-                          type="button"
-                          className="btn-holiday-delete"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteHoliday(item._id);
-                                  }}
-                          title="Delete Holiday"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        {/* Delete button (Admin only) */}
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            className="btn-holiday-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteHoliday(item._id);
+                            }}
+                            title="Delete Holiday"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                       </div>
 
                       <h3 className="holiday-name">{item.Name}</h3>
@@ -496,14 +508,23 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
                   <th>Holiday Name</th>
                   <th>Type</th>
                   <th>Status</th>
-                  <th style={{ textAlign: "right" }}>Action</th>
+                  {isAdmin && <th style={{ textAlign: "right" }}>Action</th>}
                 </tr>
               </thead>
               <tbody>
                 {filteredHolidays.map((item) => {
                   const status = getHolidayStatus(item.Date);
                   return (
-                    <tr key={item._id}>
+                    <tr 
+                      key={item._id}
+                      style={{ cursor: isAdmin ? "pointer" : "default" }}
+                      onClick={() => {
+                        if (isAdmin) {
+                          setHolidayToEdit(item);
+                          setShowAddModal(true);
+                        }
+                      }}
+                    >
                       <td style={{ fontWeight: 600 }}>
                         {formatDate(item.Date)}
                       </td>
@@ -524,19 +545,21 @@ const handleUpdateHoliday = async (holidayId, updatedData) => {
                           <span>{status.label}</span>
                         </span>
                       </td>
-                      <td style={{ textAlign: "right" }}>
-                      {user?.role === "admin" && (
-                            <button
-                              type="button"
-                              className="btn-add-holiday-primary"
-                              style={{ marginTop: "12px" }}
-                              onClick={() => setShowAddModal(true)}
-                            >
-                              <Plus size={15} />
-                              <span>Add First Holiday</span>
-                            </button>
-                          )}
-                      </td>
+                      {isAdmin && (
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="btn-holiday-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteHoliday(item._id);
+                            }}
+                            title="Delete Holiday"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

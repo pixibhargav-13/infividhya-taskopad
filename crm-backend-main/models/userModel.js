@@ -27,4 +27,4 @@ const EmpSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("user", EmpSchema);
+module.exports = mongoose.models.user || mongoose.model("user", EmpSchema);

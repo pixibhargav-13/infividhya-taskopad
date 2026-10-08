@@ -91,6 +91,8 @@ const INITIAL_TASKS = [
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [tasksError, setTasksError] = useState(null);
   const [users , setUsers] = useState(INITIAL_USERS);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -123,15 +125,21 @@ const currentUser = savedUser
 
 
   const fetchTasks = async () => {
+    setTasksLoading(true);
+    setTasksError(null);
     try {
-        const response = await API.get("/task");
+        const response = await API.get("/task", { timeout: 15000 });
 
         console.log("Full backend response:", response.data);
-        console.log("Tasks:", response.data.data);
+        console.log("Tasks:", response.data?.data);
 
-        setTasks(response.data.data);
+        setTasks(response.data?.data || []);
+        setTasksError(null);
     } catch (error) {
         console.error("Error fetching tasks:", error);
+        setTasksError("Can't fetch Tasks");
+    } finally {
+        setTasksLoading(false);
     }
 };
 
@@ -150,10 +158,10 @@ const fetchUsers = async () => {
 
 
 useEffect(() => {
-    if (!isAuthenticated) return;
     fetchTasks();
     fetchUsers();
-}, [isAuthenticated]);
+ 
+}, []);
 
 const handleSaveTask = async (savedTask) => {
   try
@@ -228,6 +236,9 @@ const handleSaveTask = async (savedTask) => {
                             searchQuery={searchQuery} 
                             onAddTask={handleOpenCreateModal} 
                             onEditTask={handleOpenEditModal} 
+                            isLoading={tasksLoading}
+                            error={tasksError}
+                            onRetry={fetchTasks}
                           />
                         } 
                       />

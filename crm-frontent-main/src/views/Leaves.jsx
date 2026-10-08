@@ -16,108 +16,47 @@ import {
   ChevronDown
 } from "lucide-react";
 import ApplyLeaveModal from "../components/ApplyLeaveModal";
+import SkeletonLoader from "../components/SkeletonLoader";
+import FetchErrorState from "../components/FetchErrorState";
 import "../styles/Leaves.css";
 import API from "../api/api"; // Import the API instance for making requests
 
-/**
- * INITIAL SAMPLE LEAVES
- * Follows the Mongoose LeaveSchema defined in BE/models/leaveModel.js:
- * {
- *   Reason: String,
- *   Leavetype: "sick" | "casual" | "vacation" | "emergency" | "other",
- *   startDate: Date,
- *   endDate: Date,
- *   status: "Pending" | "Approved" | "Rejected"
- * }
- */
-// const INITIAL_LEAVES = [
-//   {
-//     _id: "l1",
-//     Leavetype: "vacation",
-//     startDate: "2026-10-12",
-//     endDate: "2026-10-16",
-//     Reason: "Annual vacation and personal recharge period.",
-//     status: "Approved",
-//     updatedAt: "2026-09-20",
-//   },
-//   {
-//     _id: "l2",
-//     Leavetype: "sick",
-//     startDate: "2026-09-15",
-//     endDate: "2026-09-16",
-//     Reason: "Seasonal fever and doctor consultation.",
-//     status: "Approved",
-//     updatedAt: "2026-09-15",
-//   },
-//   {
-//     _id: "l3",
-//     Leavetype: "casual",
-//     startDate: "2026-10-02",
-//     endDate: "2026-10-03",
-//     Reason: "Personal errands and banking procedures.",
-//     status: "Pending",
-//     updatedAt: "2026-09-28",
-//   },
-//   {
-//     _id: "l4",
-//     Leavetype: "emergency",
-//     startDate: "2026-08-10",
-//     endDate: "2026-08-11",
-//     Reason: "Urgent family hospital visit.",
-//     status: "Approved",
-//     updatedAt: "2026-08-10",
-//   }
-// ];
-
 export default function Leaves() {
   const [leaves, setLeaves] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
 
-  /**
-   * =========================================================================
-   * BACKEND INTEGRATION READY HOOKS:
-   * When you are ready to connect to your backend, you can replace the mock
-   * state logic below with real API calls using your token from localStorage:
-   *
-   * 1. Fetching Leaves on mount:
-   *    GET http://localhost:8000/leave
-   *    Headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-   *    Response: res.data.userLeave
-   *
-   * 2. Submitting Leave Application:
-   *    POST http://localhost:8000/leave
-   *    Body: { Reason, Leavetype, startDate, endDate, status: "Pending" }
-   *
-   * 3. Deleting / Cancelling Leave Application:
-   *    DELETE http://localhost:8000/leave/:id
-   * =========================================================================
-   */
   const rawUser = localStorage.getItem("user");
   const user = rawUser ? JSON.parse(rawUser).user || JSON.parse(rawUser) : null;
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
   // get user leave data from backend
   const fetchLeave = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       let response;
       if (isAdmin) {
-        response = await API.get("/leave/all");
+        response = await API.get("/leave/all", { timeout: 15000 });
         console.log("ADMIN LEAVES:", response.data.allLeave);
         setLeaves(response.data.allLeave || []);
       } else {
-        response = await API.get("/leave/");
+        response = await API.get("/leave/", { timeout: 15000 });
         console.log("USER LEAVES:", response.data.userLeave);
         setLeaves(response.data.userLeave || []);
       }
+      setError(null);
     } catch (error) {
       console.error("Error fetching leave:", error);
+      setError("Can't fetch Leaves");
+    } finally {
+      setIsLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchLeave();
@@ -434,95 +373,106 @@ export default function Leaves() {
       </div>
 
       {/* Leave Applications Table */}
-      <div className="leaves-table-wrapper">
-        {filteredLeaves.length === 0 ? (
-          <div className="empty-leaves-box">
-            <div className="empty-leaves-icon">
-              <CalIcon size={24} />
+      {error ? (
+        <FetchErrorState 
+          title={error}
+          message="Could not fetch leave records from server. The request timed out (15s limit) or the server is starting up."
+          onRetry={fetchLeave}
+          isRetrying={isLoading}
+        />
+      ) : isLoading && leaves.length === 0 ? (
+        <SkeletonLoader count={4} type="table" />
+      ) : (
+        <div className="leaves-table-wrapper">
+          {filteredLeaves.length === 0 ? (
+            <div className="empty-leaves-box">
+              <div className="empty-leaves-icon">
+                <CalIcon size={24} />
+              </div>
+              <div className="empty-leaves-title">No Leave Applications Found</div>
+              <div className="empty-leaves-sub">
+                No leave records match your current search or status filter. Click "Apply Leave" to submit a new request.
+              </div>
             </div>
-            <div className="empty-leaves-title">No Leave Applications Found</div>
-            <div className="empty-leaves-sub">
-              No leave records match your current search or status filter. Click "Apply Leave" to submit a new request.
-            </div>
-          </div>
-        ) : (
-          <table className="leaves-table">
-            <thead>
-              <tr>
-                <th>Leave Type</th>
-                <th>Dates & Duration</th>
-                <th>Reason</th>
-                <th>Applied On</th>
-                <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLeaves.map((item) => {
-                const days = getDaysCount(item.startDate, item.endDate);
-                return (
-                  <tr key={item._id}>
-                    <td>
-                      {renderLeaveTypeBadge(item.Leavetype)}
-                    </td>
-                    <td>
-                      <div className="date-cell-wrapper">
-                        <span className="date-range-text">
-                          {formatDate(item.startDate)} → {formatDate(item.endDate)}
-                        </span>
-                        <span className="date-duration-tag">
-                          {days} {days === 1 ? "day" : "days"} duration
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="reason-cell-text" title={item.Reason}>
-                        {item.Reason}
-                      </div>
-                    </td>
-                    <td>
-                      <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
-                        {formatDate(item.updatedAt || item.startDate)}
-                      </span>
-                    </td>
-                    <td>
-                      {isAdmin ? (
-                        <div className="leave-status-select-wrapper">
-                          <select
-                            className={`leave-status-select ${item.status}`}
-                            value={item.status}
-                            onChange={(e) => handleUpdateStatus(item._id, e.target.value)}
-                          >
-                            <option value="Pending">● Pending</option>
-                            <option value="Approved">● Approved</option>
-                            <option value="Rejected">● Rejected</option>
-                          </select>
-                          <ChevronDown size={14} className="leave-status-select-icon" />
+          ) : (
+            <table className="leaves-table">
+              <thead>
+                <tr>
+                  <th>Leave Type</th>
+                  <th>Dates & Duration</th>
+                  <th>Reason</th>
+                  <th>Applied On</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLeaves.map((item) => {
+                  const days = getDaysCount(item.startDate, item.endDate);
+                  return (
+                    <tr key={item._id}>
+                      <td>
+                        {renderLeaveTypeBadge(item.Leavetype)}
+                      </td>
+                      <td>
+                        <div className="date-cell-wrapper">
+                          <span className="date-range-text">
+                            {formatDate(item.startDate)} → {formatDate(item.endDate)}
+                          </span>
+                          <span className="date-duration-tag">
+                            {days} {days === 1 ? "day" : "days"} duration
+                          </span>
                         </div>
-                      ) : (
-                        <span className={`leave-status-badge ${item.status}`}>
-                          <div className={`status-dot ${item.status}`} />
-                          <span>{item.status}</span>
+                      </td>
+                      <td>
+                        <div className="reason-cell-text" title={item.Reason}>
+                          {item.Reason}
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                          {formatDate(item.updatedAt || item.startDate)}
                         </span>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className="btn-action-delete"
-                        onClick={() => handleDeleteLeave(item._id)}
-                        title="Delete / Cancel Leave Request"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                      </td>
+                      <td>
+                        {isAdmin ? (
+                          <div className="leave-status-select-wrapper">
+                            <select
+                              className={`leave-status-select ${item.status}`}
+                              value={item.status}
+                              onChange={(e) => handleUpdateStatus(item._id, e.target.value)}
+                            >
+                              <option value="Pending">● Pending</option>
+                              <option value="Approved">● Approved</option>
+                              <option value="Rejected">● Rejected</option>
+                            </select>
+                            <ChevronDown size={14} className="leave-status-select-icon" />
+                          </div>
+                        ) : (
+                          <span className={`leave-status-badge ${item.status}`}>
+                            <div className={`status-dot ${item.status}`} />
+                            <span>{item.status}</span>
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button
+                          type="button"
+                          className="btn-action-delete"
+                          onClick={() => handleDeleteLeave(item._id)}
+                          title="Delete / Cancel Leave Request"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
 
       {/* Apply Leave Modal */}
       {showApplyModal && (

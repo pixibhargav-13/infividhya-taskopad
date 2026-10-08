@@ -1,9 +1,20 @@
 import React from "react";
 import Column from "./Column";
+import SkeletonLoader from "./SkeletonLoader";
+import FetchErrorState from "./FetchErrorState";
 import "./Board.css";
 import API from "../api/api";
 
-export default function Board({ tasks, setTasks, searchQuery, onAddTask, onEditTask }) {
+export default function Board({ 
+  tasks, 
+  setTasks, 
+  searchQuery, 
+  onAddTask, 
+  onEditTask,
+  isLoading,
+  error,
+  onRetry
+}) {
   const columnSchemas = [
     { id: "Pending", title: "Pending", color: "#FF3B30" },
     { id: "In Progress", title: "In Review", color: "#FF9F0A" },
@@ -51,21 +62,32 @@ export default function Board({ tasks, setTasks, searchQuery, onAddTask, onEditT
         </div>
       </div>
 
-      <div className="columns-layout-flex">
-        {columnSchemas.map(col => (
-          <Column 
-            key={col.id}
-            id={col.id}
-            title={col.title}
-            color={col.color}
-            tasks={filteredTasks.filter(t => t.status === col.id)}
-            onAddTask={onAddTask}
-            onEditTask={onEditTask}
-            onDeleteTask={handleDelete}
-            onDragUpdate={handleDragUpdate}
-          />
-        ))}
-      </div>
+      {error ? (
+        <FetchErrorState 
+          title={error}
+          message="Could not fetch tasks from server. The request timed out (15s limit) or the server is starting up."
+          onRetry={onRetry}
+          isRetrying={isLoading}
+        />
+      ) : isLoading && tasks.length === 0 ? (
+        <SkeletonLoader count={6} />
+      ) : (
+        <div className="columns-layout-flex">
+          {columnSchemas.map(col => (
+            <Column 
+              key={col.id}
+              id={col.id}
+              title={col.title}
+              color={col.color}
+              tasks={filteredTasks.filter(t => t.status === col.id)}
+              onAddTask={onAddTask}
+              onEditTask={onEditTask}
+              onDeleteTask={handleDelete}
+              onDragUpdate={handleDragUpdate}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

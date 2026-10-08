@@ -41,6 +41,7 @@ export default function Register() {
       setError("An error occurred during registration. Please try again.");
     }
 
+    console.log("Submitting Register Payload to authController:", { firstName, lastName, email, password });
     
     // Simulate successful registration creation route hook
    

@@ -3,67 +3,38 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-for (const key of ["MONGO_URI", "JWT_SECRET"]) {
-  if (!process.env[key]) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-}
-
 const app = express();
 
 const PORT = process.env.PORT || 8000;
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/crmproject";
 
-// Comma-separated list of frontend URLs allowed to call this API,
-// e.g. "https://taskopad.vercel.app,http://localhost:5173"
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-let dbError = null;
-
-const dbReady = mongoose
-  .connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 })
+mongoose
+  .connect(MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB");
   })
   .catch((err) => {
-    dbError = err.message;
     console.log("❌ Connection Error:");
     console.log(err);
   });
 
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors());
 app.use(express.json());
 
 const authRouter = require('./routes/authRouter');
 const taskRouter = require('./routes/taskRouter');
 const leaveRouter = require('./routes/leaveRouter');
 const holidayRouter = require('./routes/holidayRouter');
-
-const DB_STATES = ["disconnected", "connected", "connecting", "disconnecting"];
-
-app.get('/', async (req, res) => {
-  await dbReady; // let the connection attempt finish so the status is meaningful
-  res.json({
-    status: "ok",
-    database: DB_STATES[mongoose.connection.readyState] || "unknown",
-    ...(dbError && { databaseError: dbError }),
-    corsOrigin: allowedOrigins,
-  });
-});
+const notificationRouter = require("./routes/notificationRouter");
 
 app.use('/auth', authRouter);
 app.use('/task', taskRouter);
 app.use('/leave', leaveRouter);
 app.use('/holiday', holidayRouter);
+app.use("/notification", notificationRouter);
 
-// Vercel imports the app; locally we start the server ourselves.
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
 
 module.exports = app;

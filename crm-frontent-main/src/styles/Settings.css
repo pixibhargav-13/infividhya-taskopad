@@ -1,154 +1,242 @@
 /* ==========================================================================
-   SETTINGS / COMING SOON STYLES - Infividhya TaskFlow
+   SETTINGS / COMING SOON VIEW STYLES
+   Clean, Professional Apple-inspired Design (No Gradients)
    ========================================================================== */
 
-.settings-coming-soon-page {
+.settings-coming-soon-wrapper {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 180px);
-  padding: 40px 20px;
-  animation: fadeIn 250ms ease-out;
+  min-height: calc(100vh - 170px);
+  padding: 24px 16px;
+  animation: fadeIn 200ms ease-out;
 }
 
-.settings-card {
+.settings-coming-soon-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 56px 48px;
-  max-width: 720px;
+  border-radius: 20px;
+  padding: 44px 40px;
+  max-width: 680px;
   width: 100%;
-  text-align: center;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  text-align: center;
+  gap: 22px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
-/* Subtle background accent glow */
-.settings-card::before {
-  content: "";
-  position: absolute;
-  top: -80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(0, 113, 227, 0.12) 0%, rgba(0, 113, 227, 0) 70%);
+/* Status Chip with Pulse Dot */
+.coming-soon-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 113, 227, 0.06);
+  border: 1px solid rgba(0, 113, 227, 0.15);
+  color: var(--accent-blue);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+
+.status-live-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  pointer-events: none;
+  background: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+  animation: statusPulse 2s infinite ease-in-out;
 }
 
-/* Big Glowing Icon Badge */
-.settings-icon-wrapper {
-  width: 84px;
-  height: 84px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(0, 113, 227, 0.12) 0%, rgba(175, 82, 222, 0.12) 100%);
-  border: 1px solid rgba(0, 113, 227, 0.2);
+@keyframes statusPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Clean Icon Container */
+.coming-soon-icon-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: rgba(0, 113, 227, 0.08);
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  color: var(--accent-blue);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-blue);
-  box-shadow: 0 8px 24px rgba(0, 113, 227, 0.15);
-  transition: transform 250ms ease;
+  margin-top: -4px;
 }
 
-.settings-icon-wrapper:hover {
-  transform: scale(1.05) rotate(5deg);
+/* Typography Group (Solid Colors, No Gradients) */
+.coming-soon-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Pill Badge */
-.settings-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(0, 113, 227, 0.08);
-  border: 1px solid rgba(0, 113, 227, 0.18);
-  color: var(--accent-blue);
-  font-size: 12px;
+.coming-soon-headline {
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  letter-spacing: -0.6px;
+  color: var(--text-primary);
+  line-height: 1.2;
 }
 
-/* Giant Headline */
-.settings-big-title {
-  font-size: 48px;
-  font-weight: 900;
-  letter-spacing: -1.5px;
-  line-height: 1.1;
-  background: linear-gradient(135deg, #1D1D1F 0%, #0071E3 60%, #AF52DE 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-top: -6px;
-}
-
-.settings-subtext {
-  font-size: 16px;
+.coming-soon-subhead {
+  font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.55;
   max-width: 540px;
+  margin: 0 auto;
 }
 
-/* Upcoming Features Chips */
-.settings-features-container {
+/* Modules Preview Section */
+.coming-soon-modules-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 6px;
+  text-align: left;
 }
 
-.settings-features-label {
-  font-size: 12px;
-  font-weight: 600;
+.coming-soon-section-title {
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   color: var(--text-tertiary);
+  text-align: center;
 }
 
-.settings-chips-grid {
+.coming-soon-modules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.coming-soon-module-item {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.settings-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: #F5F5F7;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  align-items: flex-start;
+  gap: 12px;
+  background: #F9F9FB;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
+  padding: 14px;
   transition: all 150ms ease;
 }
 
-.settings-chip:hover {
+.coming-soon-module-item:hover {
   background: #FFFFFF;
-  border-color: rgba(0, 113, 227, 0.3);
+  border-color: rgba(0, 113, 227, 0.25);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-@media (max-width: 768px) {
-  .settings-card {
-    padding: 36px 24px;
+.module-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.module-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.module-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.module-item-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Footer Action & Meta */
+.coming-soon-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-back-tasks {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-button);
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.25);
+  transition: all 150ms ease;
+}
+
+.btn-back-tasks:hover {
+  background: #0077ED;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);
+}
+
+.btn-back-tasks:active {
+  transform: translateY(0);
+}
+
+.coming-soon-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .settings-coming-soon-card {
+    padding: 28px 20px;
+    gap: 18px;
   }
-  .settings-big-title {
-    font-size: 36px;
+
+  .coming-soon-headline {
+    font-size: 24px;
   }
-  .settings-subtext {
-    font-size: 14px;
+
+  .coming-soon-modules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coming-soon-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-back-tasks {
+    width: 100%;
+    justify-content: center;
   }
 }

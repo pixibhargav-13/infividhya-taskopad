@@ -1,7 +1,5 @@
 const task = require("../models/taskModel");
-
-const isAdmin = (user) => user.role === "admin";
-const sameUser = (a, b) => a && b && a.toString() === b.toString();
+const Notification = require("../models/notificationModel");
 
 exports.createtask = async (req, res) => {
   try {
@@ -17,7 +15,20 @@ exports.createtask = async (req, res) => {
     });
 
     await newtask.populate("createdBy", "firstName lastName email");
-await newtask.populate("assignedTo", "firstName lastName email");
+    await newtask.populate("assignedTo", "firstName lastName email");
+
+        await Notification.create({
+      user: assignedTo,
+      message: `${newtask.createdBy.firstName} ${newtask.createdBy.lastName} assigned you a new task: ${title}`,
+      type: "task",
+      relatedId: newtask._id,
+    });
+
+
+    console.log(
+      "Notification created for user:",
+      assignedTo
+    );
 
     res.status(201).json({
       message: "Task created successfully",
@@ -42,9 +53,12 @@ exports.deletetask = async (req, res) =>
             message: "task not found"
        })
         }
-        if (!isAdmin(req.user) && !sameUser(taskstodelete.createdBy, req.user._id)) {
-            return res.status(403).json({ message: "Only the task creator or an admin can delete this task" })
-        }
+
+            await Notification.deleteMany({
+            relatedId: taskstodelete._id,
+            type: "task"
+          });
+
 
         await task.findByIdAndDelete(id);
         return res.status(200).json({
@@ -73,24 +87,14 @@ exports.updatetask = async(req,res) =>
             message: "task not found"
                 }    )
         }
-        const canEdit = isAdmin(req.user)
-            || sameUser(taskstoupdate.createdBy, req.user._id)
-            || sameUser(taskstoupdate.assignedTo, req.user._id);
-        if (!canEdit) {
-            return res.status(403).json({ message: "You cannot update this task" })
-        }
-
-        const allowed = ["title", "description", "assignedTo", "status", "priority", "dueDate"];
-        const updates = {};
-        for (const key of allowed) {
-            if (req.body[key] !== undefined) updates[key] = req.body[key];
-        }
-        const data = await task.findByIdAndUpdate(id, updates, { returnDocument: 'after', runValidators: true })
+        const data = await task.findByIdAndUpdate(id, req.body, { new: true })
+          .populate("createdBy", "firstName lastName email")
+          .populate("assignedTo", "firstName lastName email");
 
          return res.status(200).json({
             message: "Task Updated Succesfully",
             data
-          })    
+          });    
         }
         catch(ex)
         {
