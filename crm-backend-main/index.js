@@ -19,15 +19,36 @@ const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigi
 
 let dbError = null;
 
-const dbReady = mongoose
-  .connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 })
+// Reconnect-safe database connection helper (handles serverless, idle timeouts, drops)
+async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (mongoose.connection.readyState === 2) {
+    // Already in the process of connecting
+    await new Promise((resolve) => {
+      mongoose.connection.once("connected", resolve);
+      mongoose.connection.once("error", resolve);
+    });
+    return mongoose.connection;
+  }
+
+  return mongoose.connect(MONGO_URI, {
+    serverSelectionTimeoutMS: 8000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+  });
+}
+
+const dbReady = connectToDatabase()
   .then(() => {
+    dbError = null;
     console.log("✅ Connected to MongoDB");
   })
   .catch((err) => {
     dbError = err.message;
-    console.log("❌ Connection Error:");
-    console.log(err);
+    console.log("❌ Connection Error:", err.message);
   });
 
 app.use(
@@ -53,6 +74,26 @@ app.use(
 
 app.use(express.json());
 
+// Database readiness middleware: ensures connection before executing queries
+app.use(async (req, res, next) => {
+  if (req.method === "OPTIONS" || req.path === "/") {
+    return next();
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectToDatabase();
+    } catch (err) {
+      console.error("❌ MongoDB connection error on request:", err.message);
+      return res.status(503).json({
+        message: "Database connection failed. Please verify MongoDB server is running and accessible.",
+        error: err.message,
+      });
+    }
+  }
+  next();
+});
+
 const authRouter = require('./routes/authRouter');
 const taskRouter = require('./routes/taskRouter');
 const leaveRouter = require('./routes/leaveRouter');
@@ -62,7 +103,12 @@ const notificationRouter = require("./routes/notificationRouter");
 const DB_STATES = ["disconnected", "connected", "connecting", "disconnecting"];
 
 app.get('/', async (req, res) => {
-  await dbReady; // let the connection attempt finish so the status is meaningful
+  try {
+    await connectToDatabase();
+  } catch (err) {
+    dbError = err.message;
+  }
+
   res.json({
     status: "ok",
     database: DB_STATES[mongoose.connection.readyState] || "unknown",
