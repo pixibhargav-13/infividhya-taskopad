@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const SECRET_TOKEN = process.env.JWT_SECRET || "hello-world-crm";
 
-
 exports.verifytoken = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
@@ -17,8 +16,6 @@ exports.verifytoken = async (req, res, next) => {
     const jwtToken = token.startsWith("Bearer ")
       ? token.split(" ")[1]
       : token;
-
-    console.log("Received Token:", jwtToken);
 
     const decoded = jwt.verify(jwtToken, SECRET_TOKEN);
 
@@ -41,76 +38,76 @@ exports.verifytoken = async (req, res, next) => {
   }
 };
 
-
-exports.login = async(req,res) =>
-{
-    const {email, password} = req.body;
-    if(!email || !password)
-    {
-         return res.status(400).json({
-             message: "Email and password are required",
-         });
-    };
-    const  users = await User.findOne({email})
-  if(!users)
-  {
-        return res.status(404).json(
-                {
-                        message: "user not found"
-                }
-        )
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email and password are required",
+    });
   }
-const checkpass = await bcrypt.compare(password , users.password);
+  const users = await User.findOne({ email });
+  if (!users) {
+    return res.status(404).json({
+      message: "user not found",
+    });
+  }
+  const checkpass = await bcrypt.compare(password, users.password);
   if (!checkpass) {
     return res.status(401).json({
       message: "Incorrect password",
     });
   }
 
-const accesstoken = jwt.sign(
-{
-    id: users.id,
-    name: users.firstName + " " + users.lastName,
-  
-},
-SECRET_TOKEN,
-{
-    expiresIn: 60*60 * 10, //10 days
-}
-)
-
-  return res.status(200).json({ accesstoken,
-     user: {
-
-  id: users._id,
-  firstName: users.firstName,
-  lastName: users.lastName,
-  email: users.email,
-  role: users.role
-  
-        
-      }, message: "User logged in successfully",} )
-    
-}
-
-exports.register = async(req,res) => {
-    try
+  const accesstoken = jwt.sign(
     {
-        const userdata = req.body
-        const hashedpass = await bcrypt.hash(userdata.password, 12)
-        await User.create({...userdata, password: hashedpass})
-        return res.status(201).json({
-            message: "User Created Succesfully"
-        })
-    }
-    catch(ex)
+      id: users.id,
+      name: users.firstName + " " + users.lastName,
+    },
+    SECRET_TOKEN,
     {
-        console.log(ex.message)
-        return res.status(500).json({
-            message: "EROOR IN User Creation"
-        })
+      expiresIn: 60 * 60 * 10, // 10 hours
     }
-}
+  );
+
+  return res.status(200).json({
+    accesstoken,
+    user: {
+      id: users._id,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      email: users.email,
+      role: users.role,
+    },
+    message: "User logged in successfully",
+  });
+};
+
+exports.register = async (req, res) => {
+  try {
+    // Only accept profile fields; role is never self-assigned (see scripts/make-admin.js)
+    const { firstName, lastName, email, password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
+    }
+    if (await User.findOne({ email })) {
+      return res.status(409).json({
+        message: "Email is already registered",
+      });
+    }
+    const hashedpass = await bcrypt.hash(password, 12);
+    await User.create({ firstName, lastName, email, password: hashedpass });
+    return res.status(201).json({
+      message: "User Created Succesfully",
+    });
+  } catch (ex) {
+    console.log(ex.message);
+    return res.status(500).json({
+      message: "EROOR IN User Creation",
+    });
+  }
+};
 
 exports.getAllUsers = async (req, res) => {
   try {
